@@ -25,6 +25,7 @@ int main(int argc, char *argv[]){
     readFile(list, argv[1]);
     insertNode(root, list);
     
+    
     return 0;
 }
 
