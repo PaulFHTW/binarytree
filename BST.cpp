@@ -10,8 +10,8 @@ struct Node{
 };
 
 void readFile(std::vector<std::string>&, std::string);
-Node* insertNode(Node*, std::vector<std::string>&);
-
+Node* insertNode(Node*, int);
+void printTree(Node *root);
 
 int main(int argc, char *argv[]){
     if(argc < 2){
@@ -21,28 +21,52 @@ int main(int argc, char *argv[]){
 
     std::vector<std::string> list;
     Node *root = nullptr;
+    int index = 0;
 
     readFile(list, argv[1]);
-    insertNode(root, list);
     
+    for(int i = 0; i < list.size(); i++){
+        root = insertNode(root, stoi(list.at(i)));
+    }
     
+    printTree(root);
     return 0;
 }
 
-Node* insertNode(Node *root, std::vector<std::string> &list){
+Node* insertNode(Node *root, int value){
     if(root == nullptr){
         root = new Node;
-        return root;
+        root->value = value;
+        root->left = nullptr;
+        root->right = nullptr;
     }
     else{
-        if(stoi(list.at(1)) < root->value){
-            root->left =  insertNode(root, list);
+        if(value < root->value){
+            root->left =  insertNode(root->left, value);
         }
         else{
-            root->right = insertNode(root, list);
+            root->right = insertNode(root->right, value);
         }
     }
     return root;
+}
+
+void printTree(Node *root){
+    std::cout << "Print Tree" << std::endl;
+
+    Node *temp = root;
+    while(temp->left != nullptr){
+        std::cout << temp->value;
+        std::cout << " left ";
+        temp = temp->left;
+    }
+    while(temp->right != nullptr){
+        std::cout << temp->value;
+        std::cout << " right ";
+        temp = temp->right;
+    }
+    std::cout << temp->value;
+    std::cout << std::endl;
 }
 
 void readFile(std::vector<std::string> &list, std::string filepath){
