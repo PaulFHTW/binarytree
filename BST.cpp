@@ -11,7 +11,10 @@ struct Node{
 
 void readFile(std::vector<std::string>&, std::string);
 Node* insertNode(Node*, int);
-void printTree(Node *root);
+void printValues(Node *root);
+Node* findMin(Node*, int&);
+Node* findMax(Node*, int&);
+float findAvg(Node*, float&, std::vector<std::string>&);
 
 int main(int argc, char *argv[]){
     if(argc < 2){
@@ -21,15 +24,26 @@ int main(int argc, char *argv[]){
 
     std::vector<std::string> list;
     Node *root = nullptr;
-    int index = 0;
+    int leftHeight = 0;
+    int rightHeight = 0;
+    float average = 0;
 
     readFile(list, argv[1]);
     
     for(int i = 0; i < list.size(); i++){
         root = insertNode(root, stoi(list.at(i)));
     }
-    
-    printTree(root);
+
+    average = findAvg(root, average, list);
+    std::cout << average << std::endl;
+    /*
+    Node *temp = root;
+    Node *left = findMin(root, leftHeight);
+    Node *right = findMax(root, rightHeight);
+    int balance = rightHeight - leftHeight;
+    std::cout << balance << std::endl; 
+    */
+    //printValues(root);
     return 0;
 }
 
@@ -51,22 +65,41 @@ Node* insertNode(Node *root, int value){
     return root;
 }
 
-void printTree(Node *root){
-    std::cout << "Print Tree" << std::endl;
+Node* findMin(Node* root, int &leftHeight){
+    if(root == nullptr)
+        return nullptr;
+    else if(root->left == nullptr)
+        return root;
+    else
+        leftHeight++;
+        return findMin(root->left, leftHeight);
+}
 
-    Node *temp = root;
-    while(temp->left != nullptr){
-        std::cout << temp->value;
-        std::cout << " left ";
-        temp = temp->left;
+Node* findMax(Node* root, int &rightHeight){
+    if(root == nullptr)
+        return nullptr;
+    else if(root->right == nullptr)
+        return root;
+    else
+        rightHeight++;
+        return findMax(root->right, rightHeight);
+}
+
+float findAvg(Node *root, float &sum, std::vector<std::string>&list){
+    if(root != nullptr){
+        findAvg(root->left, sum, list);
+        sum += root->value;
+        findAvg(root->right, sum, list);
     }
-    while(temp->right != nullptr){
-        std::cout << temp->value;
-        std::cout << " right ";
-        temp = temp->right;
+    return sum/list.size();
+}
+
+void printValues(Node *root){
+    if(root != nullptr){
+        printValues(root->left);
+        std::cout << root->value << std::endl;
+        printValues(root->right);
     }
-    std::cout << temp->value;
-    std::cout << std::endl;
 }
 
 void readFile(std::vector<std::string> &list, std::string filepath){
