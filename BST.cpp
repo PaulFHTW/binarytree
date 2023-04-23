@@ -3,20 +3,21 @@
 #include <vector>
 #include <string> 
 
-struct Node{
-    int value;
-    struct Node* left;
-    struct Node* right;
-    bool isAVL = true;
-};
-
 void readFile(std::vector<std::string>&, std::string);
 Node* insertNode(Node*, int);
 void printValues(Node *root);
 Node* findMin(Node*);
 Node* findMax(Node*);
 float findAvg(Node*, float&, std::vector<std::string>&);
-int height(Node*);
+int findHeight(Node*);
+void printStats(Node*, std::vector<std::string>&);
+
+struct Node{
+    int value;
+    struct Node* left;
+    struct Node* right;
+    bool isAVL = true;
+};
 
 int main(int argc, char *argv[]){
     if(argc < 2){
@@ -26,9 +27,6 @@ int main(int argc, char *argv[]){
 
     std::vector<std::string> list;
     Node *root = nullptr;
-    Node *min = 0;
-    Node *max = 0;
-    float average = 0;
 
     readFile(list, argv[1]);
     
@@ -36,15 +34,21 @@ int main(int argc, char *argv[]){
         root = insertNode(root, stoi(list.at(i)));
     }
 
-    height(root);
-    min = findMin(root);
-    std::cout << "min: " << min->value << ", ";
-    max = findMax(root);
-    std::cout << "max: " << max->value << ", ";
-    average = findAvg(root, average, list);
-    std::cout << " avg: " << average << std::endl;
+    printStats(root, list);
 
     return 0;
+}
+
+Node* searchBinaryTree(Node* root, int value) {
+    if (root == nullptr || root->value == value) {
+        return root;
+    }
+    else if (value < root->value) {
+        return searchBinaryTree(root->left, value);
+    }
+    else{
+        return searchBinaryTree(root->right, value);
+    }
 }
 
 Node* insertNode(Node *root, int value){
@@ -65,12 +69,12 @@ Node* insertNode(Node *root, int value){
     return root;
 }
 
-int height(Node* root){
+int findHeight(Node* root){
     if (root == nullptr) {
         return 0;
     } else {
-        int rightHeight = height(root->right);
-        int leftHeight = height(root->left);
+        int rightHeight = findHeight(root->right);
+        int leftHeight = findHeight(root->left);
         std::cout << "bal (" << root->value << ") = " << rightHeight - leftHeight;
 
         if(abs(rightHeight - leftHeight) > 1){
@@ -90,7 +94,7 @@ bool isBalanced(Node* root){
         return true;
     } 
     else{
-        int balanceFactor = height(root->left) - height(root->right);
+        int balanceFactor = findHeight(root->left) - findHeight(root->right);
         if(balanceFactor < -1 || balanceFactor > 1) {
             return false;
         }
@@ -133,6 +137,20 @@ void printValues(Node *root){
         std::cout << root->value << std::endl;
         printValues(root->right);
     }
+}
+
+void printStats(Node* root, std::vector<std::string> &list){
+    Node *min = 0;
+    Node *max = 0;
+    float average = 0;
+
+    findHeight(root);
+    min = findMin(root);
+    std::cout << "min: " << min->value << ", ";
+    max = findMax(root);
+    std::cout << "max: " << max->value << ", ";
+    average = findAvg(root, average, list);
+    std::cout << " avg: " << average << std::endl;
 }
 
 void readFile(std::vector<std::string> &list, std::string filepath){
