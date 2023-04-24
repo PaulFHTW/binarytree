@@ -3,6 +3,13 @@
 #include <vector>
 #include <string> 
 
+struct Node{
+    int value;
+    struct Node* left;
+    struct Node* right;
+    bool isAVL = true;
+};
+
 void readFile(std::vector<std::string>&, std::string);
 Node* insertNode(Node*, int);
 Node* findMin(Node*);
@@ -10,13 +17,8 @@ Node* findMax(Node*);
 float findAvg(Node*, float&, std::vector<std::string>&);
 int findHeight(Node*);
 void printStats(Node*, std::vector<std::string>&);
-
-struct Node{
-    int value;
-    struct Node* left;
-    struct Node* right;
-    bool isAVL = true;
-};
+Node* searchBinaryTree(Node*, int);
+void deleteTree(Node*);
 
 int main(int argc, char *argv[]){
     if(argc < 2){
@@ -34,20 +36,47 @@ int main(int argc, char *argv[]){
         root = insertNode(root, stoi(list.at(i)));
     }
 
-    if(argc > 2){
+    if(argc == 3){
+        int counter = 0;
+        Node *temp = nullptr;
         readFile(sublist, argv[2]);
         for(int j = 0; j < sublist.size(); j++){
-
+           temp = searchBinaryTree(root, stoi(sublist.at(j)));
+           if(temp == nullptr && sublist.size() == 1){
+                std::cout << sublist.at(j) << " not found!" << std::endl;
+                break;
+           }
+           else if(temp == nullptr && sublist.size() > 1){
+                std::cout << "Subtree not found!" << std::endl;
+                break;
+           }
+           else if(temp->value == stoi(sublist.at(j))){
+                counter++;
+           }
+           else{
+                std::cout << "Something went wrong" << std::endl;
+                exit(1);
+           }
+        }
+        
+        if(counter == sublist.size()){
+            if(sublist.size() == 1){
+                std::cout << temp->value << " found!" << std::endl;
+            }
+            else{
+                std::cout << "Subtree found!" << std::endl;
+            }
         }
     }
     
-
     printStats(root, list);
+
+    deleteTree(root);
 
     return 0;
 }
 
-Node* searchBinaryTree(Node* root, int value) {
+Node* searchBinaryTree(Node* root, int value){
     if (root == nullptr || root->value == value) {
         return root;
     }
@@ -141,8 +170,6 @@ void printStats(Node* root, std::vector<std::string> &list){
 void readFile(std::vector<std::string> &list, std::string filepath){
     std::ifstream file(filepath);
 
-    std::cout << filepath << std::endl;
-
     if(file.is_open()){
         std::string number;
         while(file.good()){
@@ -155,4 +182,12 @@ void readFile(std::vector<std::string> &list, std::string filepath){
     }
 
     file.close();
+}
+
+void deleteTree(Node *root){
+    if(root != nullptr){
+        deleteTree(root->left);
+        deleteTree(root->right);
+        delete(root);
+    }
 }
